@@ -10,8 +10,7 @@ var LAST_TIME_DAILY_REWARD = "DailyRewardLastTime";
 var TOTAL_NUMBER_REWARD_DAYS = 10;
 ////---------- TEAMS AND TOURNAMENTS CONSTANTS
 var TOURNAMENT_DURATION = TIME_ONE_HOUR * 3;
- 
-//--- UN COMMENT SOLO PARA TESTEAR GIT with request
+
 
 /***
 	 CLOUD SCRIPT FOR TEAMS AND TOURNAMENTS
@@ -50,15 +49,6 @@ handlers.CheckIfTournamentFinished = function (args)
                       ]
 
             }
-
-
-
-        var Created = server.SetTitleData({
-         							 "Key": "TeamsAndTournaments",
-      							    "Value": JSON.stringify(TournamentData)
-
-        								});
-
     }
 
 
@@ -128,12 +118,21 @@ function GetTeamsAndTournamentData()
     {
 	    	"Keys": [ "TeamsAndTournaments" ]
 	};
-    var GetTitleDataResult = server.GetTitleData(GetTitleDataRequest);
+  var GetTitleDataResult = server.GetTitleData(GetTitleDataRequest);
 
-    var TandTDAta = GetTitleDataResult.Data["TeamsAndTournaments"];
-  	var DataTaT = JSON.parse(TandTDAta);
+  return;
 
-    return DataTaT;
+  if( !GetTitleDataResult.Data.hasOwnProperty("TeamsAndTournaments"))
+  {
+       handlers.CheckIfTournamentFinished({"CodigoLoco":"123TUVIEJA"});
+       var GetTitleDataResult = server.GetTitleData(GetTitleDataRequest);
+  }
+
+
+
+  var TandTDAta = GetTitleDataResult.Data["TeamsAndTournaments"];
+  var DataTaT = JSON.parse(TandTDAta);
+  return DataTaT;
 }
 
 function GetPlayerDataForKeys( keys )
@@ -211,33 +210,23 @@ handlers.CollectBountyTournament = function ( args )
 
 }
 
-
- ////----------------------------------------------------------------------------- GET TOURNAMENT DATA
+/**------------------------------------  GET TOURNAMENT DATA --------------------------------------
+-------------------------------------------------------------------------------------------------*/
 handlers.GetTournamentData = function ( args )
 {
-
-
-	// Get Teams and Tournament Data
-	var GetTitleDataRequest =
-    {
-	    	"Keys": [ "TeamsAndTournaments" ]
-	};
-    var GetTitleDataResult = server.GetTitleData(GetTitleDataRequest);
-
-    var TandTDAta = GetTitleDataResult.Data["TeamsAndTournaments"];
-  	var DataTaT = JSON.parse(TandTDAta);
+    var TandTDAta = GetTeamsAndTournamentData();
+    return {  messageValue : "FORCED3" , data : TandTDAta  };
 
     DataTaT["TimeToFinish"] = DataTaT.EndTime - Date.now();
 
     if( DataTaT["TimeToFinish"] < 0)
     {
-    	handlers.CheckIfTournamentFinished({"CodigoLoco":"123TUVIEJA"});
+    	  handlers.CheckIfTournamentFinished({"CodigoLoco":"123TUVIEJA"});
         GetTitleDataResult = server.GetTitleData(GetTitleDataRequest);
 
         TandTDAta = GetTitleDataResult.Data["TeamsAndTournaments"];
   	    DataTaT = JSON.parse(TandTDAta);
   	    DataTaT["TimeToFinish"] = DataTaT.EndTime - Date.now();
-
     }
 
 
